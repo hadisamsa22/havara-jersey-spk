@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPK Konveksi Jersey & Apparel Custom</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        jersey: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#10b981',
+                            600: '#059669',
+                            800: '#065f46',
+                            navy: '#0f172a',
+                            navyLight: '#1e293b',
+                            accent: '#3b82f6'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            body {
+                background-color: white !important;
+                color: black !important;
+            }
+            .print-container {
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+                border: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col text-sm">
+
+    <header class="bg-slate-900 text-white sticky top-0 z-30 shadow-md no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <!-- Brand Logo -->
+                <div class="flex items-center gap-3">
+                    <div class="bg-emerald-500 text-slate-950 p-3 rounded-xl shadow-md flex items-center justify-center font-extrabold">
+                        <i data-lucide="shirt" class="w-7 h-7"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-black text-xl tracking-wider text-white leading-tight">HAVARA-JERSEY <span class="text-emerald-400">SPK SYSTEM</span></h1>
+                        <p class="text-xs text-slate-400 font-medium" id="header-instansi-name">Apparel Custom & Sublimation Specialist</p>
+                    </div>
+                </div>
+
+                <!-- Clock & Status Bar -->
+                <div class="hidden md:flex items-center gap-4 bg-slate-800/80 px-5 py-2.5 rounded-xl border border-slate-700/60">
+                    <div class="flex items-center gap-2 text-slate-300 border-r border-slate-700 pr-4" id="sync-status">
+                        <i data-lucide="cloud-off" class="w-4 h-4 text-slate-400" id="sync-icon"></i>
+                        <span class="text-sm font-semibold" id="sync-text">Lokal Mode</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-slate-300 border-r border-slate-700 pr-4">
+                        <i data-lucide="calendar" class="w-4 h-4 text-emerald-400"></i>
+                        <span id="live-date" class="text-sm font-semibold">Senin, 1 Jan 2026</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-emerald-400 font-mono font-bold text-sm">
+                        <i data-lucide="clock" class="w-4 h-4 animate-pulse"></i>
+                        <span id="live-clock">00:00:00 WITA</span>
+                    </div>
+                </div>
+
+                <!-- Mobile Navigation Toggle -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="p-2 text-slate-300 hover:text-white">
+                        <i data-lucide="menu" class="w-7 h-7"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Desktop Tabs Nav -->
+        <nav class="bg-slate-950 border-t border-slate-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex space-x-2 py-3 overflow-x-auto custom-scrollbar">
+                    <button onclick="switchTab('dashboard')" id="tab-dashboard" class="nav-tab px-5 py-2.5 rounded-xl text-sm font-bold transition flex items-center gap-2 bg-emerald-500 text-slate-950 shadow-sm">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard Produksi
+                    </button>
+                    <button onclick="switchTab('spk-list')" id="tab-spk-list" class="nav-tab px-5 py-2.5 rounded-xl text-sm font-bold transition flex items-center gap-2 text-slate-300 hover:bg-slate-800 hover:text-white">
+                        <i data-lucide="files" class="w-4 h-4"></i> Daftar SPK Jersey
+                    </button>
+                    <button onclick="openCreateForm()" id="tab-spk-form" class="nav-tab px-5 py-2.5 rounded-xl text-sm font-bold transition flex items-center gap-2 text-slate-300 hover:bg-slate-800 hover:text-white">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i> Buat SPK Baru
+                    </button>
+                    <button onclick="switchTab('pengaturan')" id="tab-pengaturan" class="nav-tab px-5 py-2.5 rounded-xl text-sm font-bold transition flex items-center gap-2 text-slate-300 hover:bg-slate-800 hover:text-white">
+                        <i data-lucide="building" class="w-4 h-4"></i> Profile Konveksi
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-slate-950 px-4 pt-3 pb-5 space-y-2 border-t border-slate-800">
+            <button onclick="switchTab('dashboard')" class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-bold flex items-center gap-3 text-white hover:bg-slate-800">
+                <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+            </button>
+            <button onclick="switchTab('spk-list')" class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-bold flex items-center gap-3 text-white hover:bg-slate-800">
+                <i data-lucide="files" class="w-4 h-4"></i> Daftar SPK
+            </button>
+            <button onclick="openCreateForm()" class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-bold flex items-center gap-3 text-white hover:bg-slate-800">
+                <i data-lucide="plus-circle" class="w-4 h-4"></i> Buat SPK Baru
+            </button>
+            <button onclick="switchTab('pengaturan')" class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-bold flex items-center gap-3 text-white hover:bg-slate-800">
+                <i data-lucide="building" class="w-4 h-4"></i> Profile Konveksi
+            </button>
+        </div>
+    </header>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="fixed top-20 right-5 z-50 flex flex-col gap-2 max-w-md pointer-events-none no-print"></div>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <!-- VIEW: DASHBOARD -->
+        <section id="view-dashboard" class="space-y-6">
+            <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-950 rounded-2xl p-6 md:p-8 text-white shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-slate-800">
+                <div class="space-y-2">
+                    <span class="bg-emerald-500/20 text-emerald-400 text-xs font-extrabold px-3.5 py-1 rounded-full uppercase tracking-widest border border-emerald-500/30">Custom Apparel Management</span>
+                    <h2 class="text-2xl md:text-3xl font-black tracking-wide">Monitoring Produksi Jersey & Apparel</h2>
+                    <p class="text-sm text-slate-300 max-w-xl">Lacak status potong kain, cetak sublimasi, jahit, hingga QC packing secara realtime.</p>
+                </div>
+                <button onclick="openCreateForm()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold px-6 py-3.5 rounded-xl text-sm shadow-lg transition flex items-center gap-2.5 shrink-0">
+                    <i data-lucide="plus" class="w-5 h-5"></i> Buat SPK Jersey Baru
+                </button>
+            </div>
+
+            <!-- Metric Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Order SPK</p>
+                    <h3 class="text-3xl font-black text-slate-900 mt-1.5" id="stat-total">0</h3>
+                    <p class="text-xs font-semibold text-slate-500 mt-1" id="stat-total-pcs">0 Pcs Total</p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm border-l-4 border-l-slate-400">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Draf / Antrean</p>
+                    <h3 class="text-3xl font-black text-slate-700 mt-1.5" id="stat-draf">0</h3>
+                    <p class="text-xs text-slate-400 mt-1">Belum Diproses</p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm border-l-4 border-l-amber-500">
+                    <p class="text-xs font-bold text-amber-600 uppercase tracking-wider">Potong Kain</p>
+                    <h3 class="text-3xl font-black text-amber-600 mt-1.5" id="stat-potong">0</h3>
+                    <p class="text-xs text-slate-400 mt-1">Cutting Pattern</p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm border-l-4 border-l-blue-500">
+                    <p class="text-xs font-bold text-blue-600 uppercase tracking-wider">Sublim / Sablon</p>
+                    <h3 class="text-3xl font-black text-blue-600 mt-1.5" id="stat-sublim">0</h3>
+                    <p class="text-xs text-slate-400 mt-1">Printing & Press</p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm border-l-4 border-l-purple-500">
+                    <p class="text-xs font-bold text-purple-600 uppercase tracking-wider">Penjahitan</p>
+                    <h3 class="text-3xl font-black text-purple-600 mt-1.5" id="stat-jahit">0</h3>
+                    <p class="text-xs text-slate-400 mt-1">Assembly Line</p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm border-l-4 border-l-emerald-500">
+                    <p class="text-xs font-bold text-emerald-600 uppercase tracking-wider">QC & Selesai</p>
+                    <h3 class="text-3xl font-black text-emerald-600 mt-1.5" id="stat-selesai">0</h3>
+                    <p class="text-xs text-slate-400 mt-1">Ready to Ship</p>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Chart 1: Status Alur Produksi -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <h3 class="font-extrabold text-slate-800 text-base mb-1">Status Alur Produksi</h3>
+                    <p class="text-xs text-slate-500 mb-4">Distribusi SPK berdasarkan tahapan kerja</p>
+                    <div class="h-60 flex items-center justify-center">
+                        <canvas id="stageChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart 2: Material Fabric Distribution -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <h3 class="font-extrabold text-slate-800 text-base mb-1">Penggunaan Bahan Kain</h3>
+                    <p class="text-xs text-slate-500 mb-4">Populeritas jenis bahan dtf/sublim</p>
+                    <div class="h-60 flex items-center justify-center">
+                        <canvas id="fabricChart"></canvas>
+                    </div>
+                    <div id="fabric-summary" class="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-2" aria-label="Ringkasan penggunaan bahan kain">
+                        <!-- Diisi otomatis oleh updateCharts() -->
+                    </div>
+                </div>
+
+                <!-- Upcoming Deadlines Feed -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
+                    <h3 class="font-extrabold text-slate-800 text-base mb-1">Deadline Produksi Terdekat</h3>
+                    <p class="text-xs text-slate-500 mb-3">Prioritas pengerjaan konveksi</p>
+                    <div id="dashboard-deadline-list" class="flex-1 overflow-y-auto custom-scrollbar space-y-3 max-h-60">
+                        <!-- Dynamic Feed -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: SPK LIST -->
+        <section id="view-spk-list" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 md:p-8">
+                <!-- Header Actions -->
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 border-b border-slate-100 pb-4">
+                    <div>
+                        <h2 class="text-xl font-extrabold text-slate-900 flex items-center gap-2">
+                            <i data-lucide="files" class="w-6 h-6 text-emerald-600"></i> Daftar SPK Konveksi Jersey
+                        </h2>
+                        <p class="text-sm text-slate-500 mt-1">Kelola seluruh order produksi dan perbarui status pekerjaan</p>
+                    </div>
+                    <div class="flex gap-2.5">
+                        <button onclick="loadDataFromSheets()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 shadow-sm transition shrink-0">
+                            <i data-lucide="refresh-cw" class="w-4 h-4"></i> Sync Data
+                        </button>
+                        <button onclick="openCreateForm()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 shadow-sm transition shrink-0">
+                            <i data-lucide="plus" class="w-4 h-4"></i> Buat SPK Baru
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 bg-slate-50 p-5 rounded-xl border border-slate-200">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1.5">Cari Pemesan / Tim / SPK</label>
+                        <input type="text" id="filter-search" oninput="renderSPKTable()" placeholder="Ketik kata kunci..." class="w-full rounded-xl border border-slate-300 p-2.5 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1.5">Tahap Produksi</label>
+                        <select id="filter-stage" onchange="renderSPKTable()" class="w-full rounded-xl border border-slate-300 p-2.5 text-sm font-semibold bg-white">
+                            <option value="ALL">Semua Tahap</option>
+                            <option value="Draf">Draf / Antrean</option>
+                            <option value="Potong Kain">Potong Kain (Cutting)</option>
+                            <option value="Sublim / Sablon">Sublimasi / Sablon</option>
+                            <option value="Penjahitan">Penjahitan (Sewing)</option>
+                            <option value="QC & Packing">QC & Packing</option>
+                            <option value="Siap Kirim / Selesai">Siap Kirim / Selesai</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1.5">Kategori Sport</label>
+                        <select id="filter-sport" onchange="renderSPKTable()" class="w-full rounded-xl border border-slate-300 p-2.5 text-sm bg-white">
+                            <option value="ALL">Semua Olahraga</option>
+                            <option value="Futsal / Sepakbola">Futsal / Sepakbola</option>
+                            <option value="Basket">Basket</option>
+                            <option value="Esports">Esports / Gaming</option>
+                            <option value="Voli">Voli</option>
+                            <option value="Badminton">Badminton</option>
+                            <option value="Running / Casual">Running / Casual</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1.5">Bahan Kain</label>
+                        <select id="filter-fabric" onchange="renderSPKTable()" class="w-full rounded-xl border border-slate-300 p-2.5 text-sm bg-white">
+                            <option value="ALL">Semua Kain</option>
+                            <option value="Nike">Nike</option>
+                            <option value="Milano">Milano</option>
+                            <option value="Embos">Embos</option>
+                            <option value="Umbul-umbul">Umbul-umbul</option>
+                            <option value="Catton Combed">Catton Combed</option>
+                            <option value="None">None</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="overflow-x-auto rounded-xl border border-slate-200">
+                    <table class="w-full text-left text-sm text-slate-600">
+                        <thead class="bg-slate-100 text-slate-700 uppercase font-bold text-xs border-b border-slate-200">
+                            <tr>
+                                <th class="p-3.5">No. SPK & Tgl</th>
+                                <th class="p-3.5">Nama Tim & Pemesan</th>
+                                <th class="p-3.5">Spesifikasi Singkat</th>
+                                <th class="p-3.5 text-center">Jumlah (Pcs)</th>
+                                <th class="p-3.5">Deadline</th>
+                                <th class="p-3.5">Tahap Produksi</th>
+                                <th class="p-3.5 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="spk-table-body" class="divide-y divide-slate-200 bg-white">
+                            <!-- Dynamic Table Rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: SPK FORM (CREATION / EDITING) -->
+        <section id="view-spk-form" class="hidden max-w-5xl mx-auto space-y-6">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 md:p-8">
+                <!-- FORM CONTENTS -->
+                <div class="border-b border-slate-100 pb-4 mb-6 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-xl font-extrabold text-slate-900 flex items-center gap-2" id="form-title">
+                            <i data-lucide="plus-circle" class="w-6 h-6 text-emerald-600"></i> Buat SPK Jersey Baru
+                        </h2>
+                        <p class="text-sm text-slate-500 mt-1">Isi rincian spesifikasi teknis dan roster pemain secara rinci</p>
+                    </div>
+                    <button onclick="switchTab('spk-list')" class="text-sm font-bold text-slate-500 hover:text-slate-800 flex items-center gap-1.5">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali
+                    </button>
+                </div>
+
+                <form id="spk-jersey-form" onsubmit="handleFormSubmit(event)" class="space-y-6">
+                    <input type="hidden" id="spk-id-hidden">
+
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
+                        <h3 class="font-extrabold text-sm text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                            <i data-lucide="user-check" class="w-5 h-5 text-emerald-600"></i> 1. Informasi Pemesan & Target Waktu
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Nomor SPK (Otomatis)</label>
+                                <input type="text" id="spk-nomor" readonly required class="w-full rounded-xl border border-slate-300 p-3 text-sm font-mono font-bold bg-slate-200 text-slate-700">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Nama Tim / Klub / Event</label>
+                                <input type="text" id="spk-nama-tim" required placeholder="Contoh: Garuda FC Surabaya" class="w-full rounded-xl border border-slate-300 p-3 text-sm font-bold">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Kategori Olahraga</label>
+                                <select id="spk-kategori-sport" required class="w-full rounded-xl border border-slate-300 p-3 text-sm bg-white font-medium">
+                                    <option value="Futsal / Sepakbola">Futsal / Sepakbola</option>
+                                    <option value="Basket">Basket</option>
+                                    <option value="Esports">Esports / Gaming</option>
+                                    <option value="Voli">Voli</option>
+                                    <option value="Badminton">Badminton</option>
+                                    <option value="Running / Casual">Running / Casual</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Nama Pemesan (PIC)</label>
+                                <input type="text" id="spk-pemesan-nama" required placeholder="Nama kontak pemesan" class="w-full rounded-xl border border-slate-300 p-3 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">No. WhatsApp / Kontak</label>
+                                <input type="text" id="spk-pemesan-kontak" required placeholder="0812-3456-xxxx" class="w-full rounded-xl border border-slate-300 p-3 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Target Deadline Selesai</label>
+                                <input type="date" id="spk-deadline" required class="w-full rounded-xl border border-slate-300 p-3 text-sm bg-white font-bold text-emerald-700">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
+                        <h3 class="font-extrabold text-sm text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                            <i data-lucide="scissors" class="w-5 h-5 text-emerald-600"></i> 2. Spesifikasi Teknis Apparel & Bahan
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Jenis Bahan / Kain</label>
+                                <select id="spk-bahan" required class="w-full rounded-xl border border-slate-300 p-3 text-sm bg-white font-medium">
+                                    <option value="Nike">Nike</option>
+                                    <option value="Milano">Milano</option>
+                                    <option value="Embos">Embos</option>
+                                    <option value="Umbul-umbul">Umbul-umbul</option>
+                                    <option value="Catton Combed">Catton Combed</option>
+                                    <option value="None">None</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Metode Cetak / Sablon</label>
+                                <select id="spk-cetak" required class="w-full rounded-xl border border-slate-300 p-3 text-sm bg-white font-medium">
+                                    <option value="Sublim Full Print">Sublim Full Print</option>
+                                    <option value="Sublim Badan + Lengan Polos">Sublim Badan + Lengan Polos</option>
+                                    <option value="DTF Full Custom">DTF (Direct Transfer Film)</option>
+                                    <option value="Polyflex / Plastisol">Polyflex / Plastisol</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Gaya Kerah (Collar Style)</label>
+                                <select id="spk-kerah" required class="w-full rounded-xl border border-slate-300 p-3 text-sm bg-white font-medium">
+                                    <option value="V-Neck Rib Custom">V-Neck Rib Custom</option>
+                                    <option value="O-Neck Rib Standard">O-Neck Rib Standard</option>
+                                    <option value="Polo / Kerah Kemeja + Kancing">Polo / Kerah Kemeja + Kancing</option>
+                                    <option value="Kerah China / Shanghai">Kerah Shanghai</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Model Pola Lengan</label>
+                                <select id="spk-lengan-model" required class="w-full rounded-xl border border-slate-300 p-3 text-sm bg-white font-medium">
+                                    <option value="Set-in Standard">Set-in Standard</option>
+                                    <option value="Raglan Style">Raglan Style</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Rib Ujung Tangan / Celana</label>
+                                <select id="spk-rib" required class="w-full rounded-xl border border-slate-300 p-3 text-sm bg-white font-medium">
+                                    <option value="Pakai Rib Tangan">Pakai Rib Tangan</option>
+                                    <option value="Tanpa Rib (Keliman Biasa)">Tanpa Rib</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Kelengkapan Paket</label>
+                                <select id="spk-paket" required class="w-full rounded-xl border border-slate-300 p-3 text-sm bg-white font-medium">
+                                    <option value="Setelan (Baju + Celana)">Setelan (Baju + Celana)</option>
+                                    <option value="Atasan Saja (Baju Only)">Atasan Saja</option>
+                                    <option value="Setelan + Kaos Kaki">Setelan + Kaos Kaki</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
+                        <h3 class="font-extrabold text-sm text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                            <i data-lucide="image" class="w-5 h-5 text-emerald-600"></i> 3. Assets Mockup Desain
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">URL Mockup Gambar</label>
+                                <input type="url" id="spk-mockup-url" onchange="previewMockupImage()" placeholder="https://..." class="w-full rounded-xl border border-slate-300 p-3 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Upload Gambar (Local)</label>
+                                <input type="file" id="spk-mockup-file" accept="image/*" onchange="handleFileUpload(event)" class="w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
+                            </div>
+                        </div>
+                        <div id="mockup-preview-container" class="hidden bg-white p-3 border border-slate-300 rounded-xl max-w-xs">
+                            <img id="mockup-preview-img" src="" class="max-h-40 rounded border border-slate-200 object-contain">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1.5">Catatan Khusus</label>
+                            <textarea id="spk-catatan-produksi" rows="2" class="w-full rounded-xl border border-slate-300 p-3 text-sm"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-extrabold text-sm text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                                    <i data-lucide="users" class="w-5 h-5 text-emerald-600"></i> 4. Roster Pemain
+                                </h3>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="bg-emerald-100 text-emerald-900 font-extrabold px-3.5 py-2 rounded-xl text-sm">Total: <span id="form-total-pcs" class="text-base">0</span> Pcs</div>
+                                <button type="button" onclick="addRosterRow()" class="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-1.5">
+                                    <i data-lucide="plus" class="w-4 h-4"></i> Tambah Pemain
+                                </button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-slate-200 text-slate-800 font-bold uppercase text-xs">
+                                    <tr>
+                                        <th class="p-3 w-12 text-center">No</th>
+                                        <th class="p-3">Nama Punggung</th>
+                                        <th class="p-3 w-28 text-center">No.</th>
+                                        <th class="p-3 w-32">Ukuran</th>
+                                        <th class="p-3 w-36">Lengan</th>
+                                        <th class="p-3">Keterangan</th>
+                                        <th class="p-3 w-14 text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="roster-table-body" class="divide-y divide-slate-200 bg-white"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="w-full sm:w-auto flex items-center gap-3">
+                            <label class="text-sm font-bold text-slate-700">Tahap Produksi:</label>
+                            <select id="spk-stage-select" class="rounded-xl border border-slate-300 p-3 text-sm font-bold bg-white text-emerald-800">
+                                <option value="Draf">Draf / Antrean</option>
+								<option value="Desain">Desain</option>
+                                <option value="Potong Kain">Potong Kain (Cutting)</option>
+                                <option value="Cetak / Sublim / Sablon">Sublim / Sablon</option>
+                                <option value="Penjahitan">Penjahitan (Sewing)</option>
+                                <option value="QC & Packing">QC & Packing</option>
+                                <option value="Siap Kirim / Selesai">Siap Kirim / Selesai</option>
+                            </select>
+                        </div>
+                        <div class="w-full sm:w-auto flex items-center justify-end gap-3">
+                            <button type="button" onclick="switchTab('spk-list')" class="px-6 py-3 rounded-xl border border-slate-300 text-sm font-bold text-slate-600 hover:bg-slate-100">Batal</button>
+                            <button type="submit" class="px-7 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold shadow-md transition flex items-center gap-2">
+                                <i data-lucide="save" class="w-4 h-4"></i> Simpan SPK Produksi
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- VIEW: PRINTABLE SPK -->
+        <section id="view-spk-print" class="hidden max-w-4xl mx-auto space-y-6">
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between no-print">
+                <button onclick="switchTab('spk-list')" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-bold flex items-center gap-1.5">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Daftar
+                </button>
+                <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-md flex items-center gap-2">
+                    <i data-lucide="printer" class="w-4 h-4"></i> Cetak SPK
+                </button>
+            </div>
+
+            <div class="bg-white p-8 md:p-10 rounded-2xl border border-slate-300 shadow-xl print-container space-y-5 text-slate-900 text-sm leading-relaxed">
+                <!-- Kop Konveksi Header -->
+                <div class="border-b-4 border-double border-slate-900 pb-3 flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="p-3.5 bg-slate-900 text-emerald-400 rounded-xl font-black text-xl"><i data-lucide="shirt" class="w-8 h-8"></i></div>
+                        <div>
+                            <h2 class="text-base md:text-lg font-black tracking-wider uppercase text-slate-900" id="print-kop-nama">-</h2>
+                            <p class="text-xs text-slate-600 font-medium" id="print-kop-sub">-</p>
+                            <p class="text-[11px] text-slate-500" id="print-kop-alamat">-</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="px-3.5 py-1.5 bg-slate-900 text-white font-extrabold text-xs rounded-lg tracking-widest uppercase">SURAT PERINTAH KERJA</span>
+                        <p class="font-mono font-bold text-sm text-slate-800 mt-1.5" id="print-spk-nomor">-</p>
+                    </div>
+                </div>
+
+                <!-- Detail Pemesan & Spesifikasi -->
+                <div class="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <table class="w-full text-xs md:text-sm space-y-1">
+                        <tr><td class="w-28 text-slate-500">Nama Tim</td><td class="font-extrabold" id="print-nama-tim">: -</td></tr>
+                        <tr><td class="text-slate-500">Pemesan (PIC)</td><td class="font-bold" id="print-pemesan-nama">: -</td></tr>
+                        <tr><td class="text-slate-500">No. HP/WA</td><td id="print-pemesan-kontak">: -</td></tr>
+                    </table>
+                    <table class="w-full text-xs md:text-sm space-y-1">
+                        <tr><td class="w-28 text-slate-500">Kategori Sport</td><td class="font-bold" id="print-kategori-sport">: -</td></tr>
+                        <tr><td class="text-slate-500">Target Deadline</td><td class="font-extrabold text-rose-700" id="print-deadline">: -</td></tr>
+                        <tr><td class="text-slate-500">Total Pesanan</td><td class="font-extrabold text-emerald-800" id="print-total-pcs">: 0 Pcs</td></tr>
+                    </table>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="md:col-span-2 bg-white border border-slate-300 rounded-xl p-4 space-y-2.5">
+                        <h4 class="font-extrabold text-xs uppercase border-b border-slate-200 pb-1.5 flex items-center gap-1.5">
+                            <i data-lucide="scissors" class="w-4 h-4 text-emerald-600"></i> Spesifikasi Material & Pola
+                        </h4>
+                        <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs">
+                            <div><span class="text-slate-500">Bahan Kain:</span> <strong id="print-bahan">-</strong></div>
+                            <div><span class="text-slate-500">Metode Cetak:</span> <strong id="print-cetak">-</strong></div>
+                            <div><span class="text-slate-500">Gaya Kerah:</span> <strong id="print-kerah">-</strong></div>
+                            <div><span class="text-slate-500">Pola Lengan:</span> <strong id="print-lengan">-</strong></div>
+                            <div><span class="text-slate-500">Rib Tangan:</span> <strong id="print-rib">-</strong></div>
+                            <div><span class="text-slate-500">Paket:</span> <strong id="print-paket">-</strong></div>
+                        </div>
+                        <div class="pt-2 border-t border-slate-200 text-xs">
+                            <span class="font-bold block">Catatan Produksi & Warna:</span>
+                            <p class="whitespace-pre-line font-mono text-xs mt-1" id="print-catatan">-</p>
+                        </div>
+                    </div>
+                    <div class="border border-slate-300 rounded-xl p-3 bg-slate-50 flex flex-col items-center justify-center text-center">
+                        <div class="w-full h-36 flex items-center justify-center bg-white rounded border border-slate-200 overflow-hidden" id="print-mockup-box"></div>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <table class="w-full text-left border-collapse border border-slate-300 text-xs">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-800 font-bold border-b border-slate-300 uppercase text-xs">
+                                <th class="border border-slate-300 p-2 text-center w-10">No</th>
+                                <th class="border border-slate-300 p-2">Nama Punggung</th>
+                                <th class="border border-slate-300 p-2 text-center w-20">No.</th>
+                                <th class="border border-slate-300 p-2 text-center w-20">Ukuran</th>
+                                <th class="border border-slate-300 p-2 w-28">Lengan</th>
+                                <th class="border border-slate-300 p-2">Keterangan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="print-roster-tbody"></tbody>
+                    </table>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- VIEW: SETTINGS -->
+        <section id="view-pengaturan" class="hidden max-w-3xl mx-auto space-y-6">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 md:p-8">
+                <div class="border-b border-slate-100 pb-4 mb-6">
+                    <h2 class="text-xl font-extrabold text-slate-900 flex items-center gap-2">
+                        <i data-lucide="building" class="w-6 h-6 text-emerald-600"></i> Profile Konveksi & Kop SPK
+                    </h2>
+                </div>
+                <form id="instansi-form" onsubmit="saveInstansiSettings(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold mb-1.5">Nama Brand Konveksi / Apparel</label>
+                        <input type="text" id="setting-nama" required class="w-full rounded-xl border border-slate-300 p-3 text-sm font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold mb-1.5">Sub-Header / Tagline Studio</label>
+                        <input type="text" id="setting-sub" required class="w-full rounded-xl border border-slate-300 p-3 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold mb-1.5">Alamat & No. Kontak Resmi</label>
+                        <textarea id="setting-alamat" rows="2" required class="w-full rounded-xl border border-slate-300 p-3 text-sm"></textarea>
+                    </div>
+                    <div class="pt-4 flex justify-end">
+                        <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-7 py-3 rounded-xl text-sm font-bold shadow-md">Simpan Profile</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // ====================================================================
+        // KONFIGURASI GOOGLE SHEETS API
+        // ====================================================================
+        const GOOGLE_SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxqittLi2wTVoy2NqssJXxnrVKnxu0L75r7KEtQr6K3jaQ7Fip3yWdJqY_-5U_hjlMM/exec';
+        const GOOGLE_SHEET_REQUEST_TIMEOUT = 15000;
+
+        const DEFAULT_PROFILE = {
+            nama: "HAVARA-JERSEY APPAREL CUSTOM",
+            sub: "Digital & Sublimation Printing Specialist",
+            alamat: "Jl. Merpati Dasan Geres Gerung Lombok Barat | WA: 087749999922"
+        };
+
+        function readLocalJSON(key, fallback) {
+            try {
+                const value = localStorage.getItem(key);
+                return value ? JSON.parse(value) : fallback;
+            } catch (error) {
+                console.warn(`Data lokal untuk ${key} tidak valid, memakai nilai default.`, error);
+                return fallback;
+            }
+        }
+
+        let spkList = readLocalJSON('edu_jersey_spk_list', []);
+        let profileSettings = { ...DEFAULT_PROFILE, ...readLocalJSON('edu_jersey_profile', {}) };
+        let activeSPK = null;
+        let uploadedMockupBase64 = null;
+        let stageChartInstance = null;
+        let fabricChartInstance = null;
+        let isLoadingFromSheets = false;
+
+        // Init App
+        window.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            initLiveClock();
+            loadProfileSettings();
+            initCharts();
+            
+            // Muat Data dari Local dan Sync ke Sheets
+            renderSPKTable();
+            updateDashboard();
+            loadDataFromSheets();
+        });
+
+        // ---------------- GOOGLE SHEETS SYNC LOGIC ----------------
+        function isSheetsConfigured() {
+            return Boolean(GOOGLE_SHEET_WEB_APP_URL && !GOOGLE_SHEET_WEB_APP_URL.includes('MASUKKAN_URL'));
+        }
+
+        function setSyncStatus(state) {
+            const syncIcon = document.getElementById('sync-icon');
+            const syncText = document.getElementById('sync-text');
+            if (!syncIcon || !syncText) return;
+
+            syncIcon.classList.remove('animate-spin', 'text-blue-400', 'text-emerald-400', 'text-rose-400', 'text-slate-400');
+            if (state === 'loading') {
+                syncIcon.setAttribute('data-lucide', 'refresh-cw');
+                syncIcon.classList.add('animate-spin', 'text-blue-400');
+                syncText.innerText = 'Syncing...';
+            } else if (state === 'success') {
+                syncIcon.setAttribute('data-lucide', 'cloud-check');
+                syncIcon.classList.add('text-emerald-400');
+                syncText.innerText = 'Tersinkronisasi';
+            } else if (state === 'error') {
+                syncIcon.setAttribute('data-lucide', 'cloud-off');
+                syncIcon.classList.add('text-rose-400');
+                syncText.innerText = 'Sync Gagal';
+            } else {
+                syncIcon.setAttribute('data-lucide', 'cloud-off');
+                syncIcon.classList.add('text-slate-400');
+                syncText.innerText = 'Lokal Mode';
+            }
+            lucide.createIcons();
+        }
+
+        async function requestSheets(path = '', options = {}) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), GOOGLE_SHEET_REQUEST_TIMEOUT);
+            try {
+                const response = await fetch(`${GOOGLE_SHEET_WEB_APP_URL}${path}`, {
+                    cache: 'no-store',
+                    ...options,
+                    signal: controller.signal
+                });
+                const raw = await response.text();
+                let result;
+                try {
+                    result = JSON.parse(raw);
+                } catch (parseError) {
+                    throw new Error(`Respons Google Sheets bukan JSON (${response.status}).`);
+                }
+                if (!response.ok || !result || result.status !== 'success') {
+                    throw new Error(result?.message || `Request Google Sheets gagal (${response.status}).`);
+                }
+                return result;
+            } finally {
+                clearTimeout(timeoutId);
+            }
+        }
+
+        function normalizeSPKRecord(item) {
+            const record = item && typeof item === 'object' ? item : {};
+            let roster = record.roster;
+            if (typeof roster === 'string') {
+                try { roster = JSON.parse(roster); } catch (error) { roster = []; }
+            }
+            return {
+                ...record,
+                id: String(record.id || `SPK-JRS-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`),
+                nomor: String(record.nomor || ''),
+                namaTim: String(record.namaTim || ''),
+                pemesanNama: String(record.pemesanNama || ''),
+                stage: String(record.stage || 'Draf'),
+                roster: Array.isArray(roster) ? roster : []
+            };
+        }
+
+        async function syncToGoogleSheets(action, payloadData) {
+            if (!isSheetsConfigured()) {
+                setSyncStatus('offline');
+                console.log('Mode Offline: Google Sheets belum dikonfigurasi.');
+                return false;
+            }
+            setSyncStatus('loading');
+            try {
+                await requestSheets('', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8', 'Accept': 'application/json' },
+                    body: JSON.stringify({ action, data: payloadData })
+                });
+                setSyncStatus('success');
+                return true;
+            } catch (error) {
+                console.error('Gagal sinkronisasi ke Sheets:', error);
+                setSyncStatus('error');
+                showToast(`Sync gagal: ${error.name === 'AbortError' ? 'koneksi timeout' : error.message}`, 'warning');
+                return false;
+            }
+        }
+
+        async function loadDataFromSheets() {
+            if (!isSheetsConfigured() || isLoadingFromSheets) return;
+            isLoadingFromSheets = true;
+            setSyncStatus('loading');
+            try {
+                showToast('Sedang memuat data dari Database Spreadsheet...', 'info');
+                const result = await requestSheets('?action=getSPK');
+                if (!Array.isArray(result.data)) throw new Error('Format data Spreadsheet tidak valid.');
+
+                spkList = result.data.map(normalizeSPKRecord);
+                localStorage.setItem('edu_jersey_spk_list', JSON.stringify(spkList));
+                renderSPKTable();
+                updateDashboard();
+                updateCharts();
+                setSyncStatus('success');
+                showToast(spkList.length ? 'Database Tersinkronisasi Berhasil!' : 'Koneksi berhasil, database Spreadsheet masih kosong.', 'success');
+            } catch (error) {
+                console.error('Gagal mengambil data dari Sheets:', error);
+                setSyncStatus('error');
+                showToast(`Koneksi Spreadsheet bermasalah (${error.name === 'AbortError' ? 'timeout' : error.message}). Memakai data lokal.`, 'warning');
+            } finally {
+                isLoadingFromSheets = false;
+            }
+        }
+        // ------------------------------------------------------------ 
+
+        function initLiveClock() {
+            const updateTime = () => {
+                const now = new Date();
+                document.getElementById('live-date').innerText = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
+                document.getElementById('live-clock').innerText = now.toLocaleTimeString('id-ID') + ' WITA';
+            };
+            updateTime();
+            setInterval(updateTime, 1000);
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        function switchTab(tabId) {
+            const tabs = ['dashboard', 'spk-list', 'spk-form', 'spk-print', 'pengaturan'];
+            tabs.forEach(t => {
+                const view = document.getElementById(`view-${t}`);
+                if (view) view.classList.add('hidden');
+                const btn = document.getElementById(`tab-${t}`);
+                if (btn) {
+                    btn.classList.remove('bg-emerald-500', 'text-slate-950');
+                    btn.classList.add('text-slate-300', 'hover:bg-slate-800');
+                }
+            });
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-emerald-500', 'text-slate-950');
+                activeBtn.classList.remove('text-slate-300', 'hover:bg-slate-800');
+            }
+            document.getElementById('mobile-menu').classList.add('hidden');
+
+            if (tabId === 'dashboard') {
+                updateDashboard();
+                updateCharts();
+            }
+        }
+
+        function generateAutoSPKNumber() {
+            const date = new Date();
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const seq = String(spkList.length + 1).padStart(4, '0');
+            return `SPK/${year}/${month}/${seq}`;
+        }
+
+        function addRosterRow(data = {}) {
+            const tbody = document.getElementById('roster-table-body');
+            const rowCount = tbody.querySelectorAll('tr').length + 1;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="p-3 text-center font-bold text-slate-500 row-index">${rowCount}</td>
+                <td class="p-3"><input type="text" required placeholder="NAMA PUNGGUNG" value="${data.nama || ''}" class="row-nama uppercase w-full border border-slate-300 rounded-lg p-2 text-sm font-bold"></td>
+                <td class="p-3"><input type="text" placeholder="10" value="${data.no || ''}" class="row-no w-full border border-slate-300 rounded-lg p-2 text-sm text-center font-mono font-bold"></td>
+                <td class="p-3">
+                    <select class="row-size w-full border border-slate-300 rounded-lg p-2 text-sm font-bold bg-white">
+                        <option value="S" ${data.size === 'S' ? 'selected' : ''}>S</option>
+                        <option value="M" ${data.size === 'M' || !data.size ? 'selected' : ''}>M</option>
+                        <option value="L" ${data.size === 'L' ? 'selected' : ''}>L</option>
+                        <option value="XL" ${data.size === 'XL' ? 'selected' : ''}>XL</option>
+                        <option value="XXL" ${data.size === 'XXL' ? 'selected' : ''}>XXL (+5k)</option>
+                        <option value="XXXL" ${data.size === 'XXXL' ? 'selected' : ''}>XXXL (+10k)</option>
+                    </select>
+                </td>
+                <td class="p-3">
+                    <select class="row-lengan w-full border border-slate-300 rounded-lg p-2 text-sm bg-white font-medium">
+                        <option value="Pendek" ${data.lengan === 'Pendek' || !data.lengan ? 'selected' : ''}>Lengan Pendek</option>
+                        <option value="Panjang" ${data.lengan === 'Panjang' ? 'selected' : ''}>Lengan Panjang</option>
+                        <option value="Tanpa Lengan (Yukensi)" ${data.lengan === 'Tanpa Lengan (Yukensi)' ? 'selected' : ''}>Tanpa Lengan</option>
+                    </select>
+                </td>
+                <td class="p-3"><input type="text" placeholder="Posisi/Catatan..." value="${data.ket || ''}" class="row-ket w-full border border-slate-300 rounded-lg p-2 text-sm"></td>
+                <td class="p-3 text-center">
+                    <button type="button" onclick="removeRosterRow(this)" class="text-rose-500 hover:text-rose-700 p-1.5"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+            lucide.createIcons();
+            calculateFormTotalPcs();
+        }
+
+        function removeRosterRow(button) {
+            button.closest('tr').remove();
+            document.querySelectorAll('#roster-table-body tr').forEach((r, idx) => r.querySelector('.row-index').innerText = idx + 1);
+            calculateFormTotalPcs();
+        }
+
+        function calculateFormTotalPcs() {
+            document.getElementById('form-total-pcs').innerText = document.querySelectorAll('#roster-table-body tr').length;
+        }
+
+        function previewMockupImage() {
+            const url = document.getElementById('spk-mockup-url').value;
+            const container = document.getElementById('mockup-preview-container');
+            if (url) {
+                document.getElementById('mockup-preview-img').src = url;
+                container.classList.remove('hidden');
+            } else container.classList.add('hidden');
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedMockupBase64 = e.target.result;
+                    document.getElementById('mockup-preview-img').src = uploadedMockupBase64;
+                    document.getElementById('mockup-preview-container').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function openCreateForm() {
+            activeSPK = null;
+            uploadedMockupBase64 = null;
+            document.getElementById('spk-jersey-form').reset();
+            document.getElementById('spk-id-hidden').value = '';
+            document.getElementById('spk-nomor').value = generateAutoSPKNumber();
+            document.getElementById('form-title').innerHTML = `<i data-lucide="plus-circle" class="w-6 h-6 text-emerald-600"></i> Buat SPK Jersey Baru`;
+            document.getElementById('mockup-preview-container').classList.add('hidden');
+            document.getElementById('roster-table-body').innerHTML = '';
+            addRosterRow(); addRosterRow();
+            switchTab('spk-form');
+            lucide.createIcons();
+        }
+
+        function editSPK(id) {
+            const spk = spkList.find(item => item.id === id);
+            if (!spk) return;
+            activeSPK = spk;
+            uploadedMockupBase64 = spk.mockupUrl;
+            document.getElementById('spk-id-hidden').value = spk.id;
+            document.getElementById('spk-nomor').value = spk.nomor;
+            document.getElementById('spk-nama-tim').value = spk.namaTim;
+            document.getElementById('spk-kategori-sport').value = spk.kategoriSport;
+            document.getElementById('spk-pemesan-nama').value = spk.pemesanNama;
+            document.getElementById('spk-pemesan-kontak').value = spk.pemesanKontak;
+            document.getElementById('spk-deadline').value = spk.deadline;
+            document.getElementById('spk-bahan').value = spk.bahan;
+            document.getElementById('spk-cetak').value = spk.cetak;
+            document.getElementById('spk-kerah').value = spk.kerah;
+            document.getElementById('spk-lengan-model').value = spk.lenganModel;
+            document.getElementById('spk-rib').value = spk.rib;
+            document.getElementById('spk-paket').value = spk.paket;
+            document.getElementById('spk-catatan-produksi').value = spk.catatan;
+            document.getElementById('spk-stage-select').value = spk.stage;
+            document.getElementById('spk-mockup-url').value = spk.mockupUrl && !spk.mockupUrl.startsWith('data:') ? spk.mockupUrl : '';
+            
+            if (spk.mockupUrl) {
+                document.getElementById('mockup-preview-img').src = spk.mockupUrl;
+                document.getElementById('mockup-preview-container').classList.remove('hidden');
+            }
+            
+            document.getElementById('roster-table-body').innerHTML = '';
+            if (spk.roster && spk.roster.length > 0) spk.roster.forEach(r => addRosterRow(r));
+            else addRosterRow();
+
+            document.getElementById('form-title').innerText = "Edit SPK Jersey (" + spk.nomor + ")";
+            switchTab('spk-form');
+        }
+
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            const rosterData = [];
+            document.querySelectorAll('#roster-table-body tr').forEach(r => {
+                const nama = r.querySelector('.row-nama').value.toUpperCase();
+                if (nama) rosterData.push({
+                    nama, 
+                    no: r.querySelector('.row-no').value, 
+                    size: r.querySelector('.row-size').value, 
+                    lengan: r.querySelector('.row-lengan').value, 
+                    ket: r.querySelector('.row-ket').value
+                });
+            });
+
+            if (rosterData.length === 0) {
+                showToast("Minimal masukkan 1 data roster pemain!", "warning");
+                return;
+            }
+
+            const spkId = document.getElementById('spk-id-hidden').value;
+            const newSPK = {
+                id: spkId || 'SPK-JRS-' + Date.now(),
+                nomor: document.getElementById('spk-nomor').value,
+                namaTim: document.getElementById('spk-nama-tim').value,
+                kategoriSport: document.getElementById('spk-kategori-sport').value,
+                pemesanNama: document.getElementById('spk-pemesan-nama').value,
+                pemesanKontak: document.getElementById('spk-pemesan-kontak').value,
+                deadline: document.getElementById('spk-deadline').value,
+                bahan: document.getElementById('spk-bahan').value,
+                cetak: document.getElementById('spk-cetak').value,
+                kerah: document.getElementById('spk-kerah').value,
+                lenganModel: document.getElementById('spk-lengan-model').value,
+                rib: document.getElementById('spk-rib').value,
+                paket: document.getElementById('spk-paket').value,
+                catatan: document.getElementById('spk-catatan-produksi').value,
+                stage: document.getElementById('spk-stage-select').value,
+                mockupUrl: uploadedMockupBase64 || document.getElementById('spk-mockup-url').value,
+                roster: rosterData
+            };
+
+            if (spkId) {
+                const idx = spkList.findIndex(item => item.id === spkId);
+                if (idx !== -1) spkList[idx] = newSPK;
+                showToast("SPK diperbarui", "success");
+            } else {
+                spkList.unshift(newSPK);
+                showToast("SPK baru diterbitkan", "success");
+            }
+
+            localStorage.setItem('edu_jersey_spk_list', JSON.stringify(spkList));
+            renderSPKTable();
+            updateDashboard();
+            previewPrintSPK(newSPK.id);
+
+            syncToGoogleSheets('save', newSPK);
+        }
+
+        function deleteSPK(id) {
+            if (confirm("Hapus SPK ini secara permanen?")) {
+                spkList = spkList.filter(item => item.id !== id);
+                localStorage.setItem('edu_jersey_spk_list', JSON.stringify(spkList));
+                renderSPKTable();
+                updateDashboard();
+                showToast("Dokumen SPK dihapus", "info");
+                
+                syncToGoogleSheets('delete', id);
+            }
+        }
+
+        function updateStage(id, newStage) {
+            const spk = spkList.find(item => item.id === id);
+            if (spk) {
+                spk.stage = newStage;
+                localStorage.setItem('edu_jersey_spk_list', JSON.stringify(spkList));
+                renderSPKTable();
+                updateDashboard();
+                showToast(`Tahap SPK diubah ke: ${newStage}`, "success");
+
+                syncToGoogleSheets('updateStage', { id: id, stage: newStage });
+            }
+        }
+
+        function getFabricKey(value) {
+            const bahan = String(value || '').trim().toLowerCase();
+            if (!bahan || bahan === 'none' || bahan === 'null' || bahan === '-') return 'none';
+            if (bahan.includes('nike') || bahan.includes('wave')) return 'nike';
+            if (bahan.includes('milano')) return 'milano';
+            if (bahan.includes('embos') || bahan.includes('paragon')) return 'embos';
+            if (bahan.includes('umbul')) return 'umbul-umbul';
+            if (bahan.includes('catton') || bahan.includes('cotton') || bahan.includes('combed')) return 'catton-combed';
+            return bahan;
+        }
+
+        function renderSPKTable() {
+            const tbody = document.getElementById('spk-table-body');
+            const search = document.getElementById('filter-search').value.toLowerCase();
+            const stageFilter = document.getElementById('filter-stage').value;
+            const sportFilter = document.getElementById('filter-sport').value;
+            const fabricFilter = document.getElementById('filter-fabric').value;
+
+            tbody.innerHTML = '';
+            const filtered = spkList.filter(item => {
+                const matchSearch = item.nomor.toLowerCase().includes(search) || item.namaTim.toLowerCase().includes(search) || item.pemesanNama.toLowerCase().includes(search);
+                const matchStage = stageFilter === 'ALL' ? true : item.stage === stageFilter;
+                const matchSport = sportFilter === 'ALL' ? true : item.kategoriSport === sportFilter;
+                const matchFabric = fabricFilter === 'ALL' ? true : getFabricKey(item.bahan) === getFabricKey(fabricFilter);
+                return matchSearch && matchStage && matchSport && matchFabric;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-6 text-slate-400 text-sm">Tidak ada SPK ditemukan.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach(item => {
+                const totalPcs = item.roster ? item.roster.length : 0;
+                let stageBadge = "bg-slate-100 text-slate-700 border-slate-300";
+                if (item.stage === 'Potong Kain') stageBadge = "bg-amber-100 text-amber-800 border-amber-300";
+                if (item.stage === 'Sublim / Sablon') stageBadge = "bg-blue-100 text-blue-800 border-blue-300";
+                if (item.stage === 'Penjahitan') stageBadge = "bg-purple-100 text-purple-800 border-purple-300";
+                if (item.stage === 'QC & Packing') stageBadge = "bg-teal-100 text-teal-800 border-teal-300";
+                if (item.stage === 'Siap Kirim / Selesai') stageBadge = "bg-emerald-100 text-emerald-800 border-emerald-300";
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition";
+                tr.innerHTML = `
+                    <td class="p-3.5">
+                        <span class="font-mono font-extrabold text-slate-900 block text-sm">${item.nomor}</span>
+                        <span class="text-xs text-slate-400 font-medium">${item.kategoriSport}</span>
+                    </td>
+                    <td class="p-3.5">
+                        <div class="font-black text-slate-900 text-sm">${item.namaTim}</div>
+                        <div class="text-xs text-slate-500 font-medium">PIC: ${item.pemesanNama}</div>
+                    </td>
+                    <td class="p-3.5">
+                        <div class="text-sm font-semibold text-slate-800">${item.bahan}</div>
+                        <div class="text-xs text-slate-500 font-medium">${item.cetak}</div>
+                    </td>
+                    <td class="p-3.5 text-center"><span class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-900 font-extrabold text-xs border border-slate-200">${totalPcs} Pcs</span></td>
+                    <td class="p-3.5"><span class="font-extrabold text-rose-600 text-sm">${item.deadline}</span></td>
+                    <td class="p-3.5">
+                        <select onchange="updateStage('${item.id}', this.value)" class="text-xs font-extrabold px-3 py-1.5 rounded-lg border ${stageBadge} bg-white">
+                            <option value="Draf" ${item.stage === 'Draf' ? 'selected' : ''}>Draf / Antrean</option>
+                            <option value="Potong Kain" ${item.stage === 'Potong Kain' ? 'selected' : ''}>Potong Kain</option>
+                            <option value="Sublim / Sablon" ${item.stage === 'Sublim / Sablon' ? 'selected' : ''}>Sublim / Sablon</option>
+                            <option value="Penjahitan" ${item.stage === 'Penjahitan' ? 'selected' : ''}>Penjahitan</option>
+                            <option value="QC & Packing" ${item.stage === 'QC & Packing' ? 'selected' : ''}>QC & Packing</option>
+                            <option value="Siap Kirim / Selesai" ${item.stage === 'Siap Kirim / Selesai' ? 'selected' : ''}>Siap Kirim / Selesai</option>
+                        </select>
+                    </td>
+                    <td class="p-3.5 text-center">
+                        <div class="flex items-center justify-center gap-1.5">
+                            <button onclick="previewPrintSPK('${item.id}')" title="Cetak Lembar SPK" class="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg"><i data-lucide="printer" class="w-4 h-4"></i></button>
+                            <button onclick="editSPK('${item.id}')" title="Edit Dokumen" class="p-2 text-slate-600 hover:bg-slate-100 rounded-lg"><i data-lucide="edit" class="w-4 h-4"></i></button>
+                            <button onclick="deleteSPK('${item.id}')" title="Hapus" class="p-2 text-rose-600 hover:bg-rose-50 rounded-lg"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            lucide.createIcons();
+        }
+
+        function previewPrintSPK(id) {
+            const spk = spkList.find(item => item.id === id);
+            if (!spk) return;
+
+            document.getElementById('print-kop-nama').innerText = profileSettings.nama;
+            document.getElementById('print-kop-sub').innerText = profileSettings.sub;
+            document.getElementById('print-kop-alamat').innerText = profileSettings.alamat;
+            document.getElementById('print-spk-nomor').innerText = spk.nomor;
+            document.getElementById('print-nama-tim').innerText = ": " + spk.namaTim;
+            document.getElementById('print-pemesan-nama').innerText = ": " + spk.pemesanNama;
+            document.getElementById('print-pemesan-kontak').innerText = ": " + spk.pemesanKontak;
+            document.getElementById('print-kategori-sport').innerText = ": " + spk.kategoriSport;
+            document.getElementById('print-deadline').innerText = ": " + spk.deadline;
+            
+            const totalPcs = spk.roster ? spk.roster.length : 0;
+            document.getElementById('print-total-pcs').innerText = `: ${totalPcs} Pcs`;
+            document.getElementById('print-bahan').innerText = spk.bahan;
+            document.getElementById('print-cetak').innerText = spk.cetak;
+            document.getElementById('print-kerah').innerText = spk.kerah;
+            document.getElementById('print-lengan').innerText = spk.lenganModel;
+            document.getElementById('print-rib').innerText = spk.rib;
+            document.getElementById('print-paket').innerText = spk.paket;
+            document.getElementById('print-catatan').innerText = spk.catatan || '-';
+
+            const mockupBox = document.getElementById('print-mockup-box');
+            if (spk.mockupUrl) {
+                mockupBox.innerHTML = `<img src="${spk.mockupUrl}" class="max-h-36 object-contain rounded">`;
+            } else mockupBox.innerHTML = `<span class="text-xs text-slate-400">Tidak ada mockup</span>`;
+
+            const tbody = document.getElementById('print-roster-tbody');
+            tbody.innerHTML = '';
+            if (spk.roster && spk.roster.length > 0) {
+                spk.roster.forEach((item, index) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="border border-slate-300 p-2 text-center font-bold text-xs">${index + 1}</td>
+                        <td class="border border-slate-300 p-2 font-extrabold uppercase text-xs">${item.nama}</td>
+                        <td class="border border-slate-300 p-2 text-center font-mono font-bold text-xs">${item.no || '-'}</td>
+                        <td class="border border-slate-300 p-2 text-center font-bold text-xs">${item.size}</td>
+                        <td class="border border-slate-300 p-2 text-xs">${item.lengan}</td>
+                        <td class="border border-slate-300 p-2 text-slate-600 text-xs">${item.ket || '-'}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+            switchTab('spk-print');
+        }
+
+        function updateDashboard() {
+            const total = spkList.length;
+            let totalPcsSum = 0;
+            const draf = spkList.filter(s => s.stage === 'Draf').length;
+            const potong = spkList.filter(s => s.stage === 'Potong Kain').length;
+            const sublim = spkList.filter(s => s.stage === 'Sublim / Sablon').length;
+            const jahit = spkList.filter(s => s.stage === 'Penjahitan').length;
+            const selesai = spkList.filter(s => s.stage === 'QC & Packing' || s.stage === 'Siap Kirim / Selesai').length;
+
+            spkList.forEach(s => { if (s.roster) totalPcsSum += s.roster.length; });
+
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-total-pcs').innerText = `${totalPcsSum} Pcs Total`;
+            document.getElementById('stat-draf').innerText = draf;
+            document.getElementById('stat-potong').innerText = potong;
+            document.getElementById('stat-sublim').innerText = sublim;
+            document.getElementById('stat-jahit').innerText = jahit;
+            document.getElementById('stat-selesai').innerText = selesai;
+
+            const deadlineFeed = document.getElementById('dashboard-deadline-list');
+            deadlineFeed.innerHTML = '';
+            [...spkList].sort((a, b) => new Date(a.deadline) - new Date(b.deadline)).slice(0, 5).forEach(spk => {
+                const item = document.createElement('div');
+                item.className = "flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200 text-sm";
+                item.innerHTML = `
+                    <div>
+                        <p class="font-extrabold text-slate-900">${spk.namaTim}</p>
+                        <span class="text-xs text-slate-400 font-mono">${spk.nomor}</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs font-extrabold text-rose-600 block">${spk.deadline}</span>
+                        <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">${spk.stage}</span>
+                    </div>
+                `;
+                deadlineFeed.appendChild(item);
+            });
+        }
+
+        function initCharts() {
+            const ctx1 = document.getElementById('stageChart').getContext('2d');
+            stageChartInstance = new Chart(ctx1, {
+                type: 'doughnut',
+                data: { labels: ['Draf', 'Potong', 'Sublim', 'Jahit', 'QC/Selesai'], datasets: [{ data: [0,0,0,0,0], backgroundColor: ['#94a3b8', '#f59e0b', '#3b82f6', '#a855f7', '#10b981'] }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 12 } } } } }
+            });
+
+            const ctx2 = document.getElementById('fabricChart').getContext('2d');
+            fabricChartInstance = new Chart(ctx2, {
+                type: 'bar',
+                data: { labels: ['Nike', 'Milano', 'Embos', 'Umbul-umbul', 'Catton Combed', 'None'], datasets: [{ label: 'Total SPK', data: [0,0,0,0,0,0], backgroundColor: '#10b981', borderRadius: 6 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } } }, x: { ticks: { font: { size: 11 } } } } }
+            });
+            updateCharts();
+        }
+
+        function updateCharts() {
+            if (!stageChartInstance || !fabricChartInstance) return;
+            stageChartInstance.data.datasets[0].data = [
+                spkList.filter(s => s.stage === 'Draf').length,
+                spkList.filter(s => s.stage === 'Potong Kain').length,
+                spkList.filter(s => s.stage === 'Sublim / Sablon').length,
+                spkList.filter(s => s.stage === 'Penjahitan').length,
+                spkList.filter(s => s.stage === 'QC & Packing' || s.stage === 'Siap Kirim / Selesai').length
+            ];
+            stageChartInstance.update();
+
+            fabricChartInstance.data.datasets[0].data = [
+                spkList.filter(s => getFabricKey(s.bahan) === 'nike').length,
+                spkList.filter(s => getFabricKey(s.bahan) === 'milano').length,
+                spkList.filter(s => getFabricKey(s.bahan) === 'embos').length,
+                spkList.filter(s => getFabricKey(s.bahan) === 'umbul-umbul').length,
+                spkList.filter(s => getFabricKey(s.bahan) === 'catton-combed').length,
+                spkList.filter(s => getFabricKey(s.bahan) === 'none').length
+            ];
+            const fabricSummary = document.getElementById('fabric-summary');
+            if (fabricSummary) {
+                const fabricLabels = ['Nike', 'Milano', 'Embos', 'Umbul-umbul', 'Catton Combed', 'None'];
+                const fabricColors = [
+                    'border-blue-200 bg-blue-50 text-blue-800',
+                    'border-emerald-200 bg-emerald-50 text-emerald-800',
+                    'border-amber-200 bg-amber-50 text-amber-800',
+                    'border-purple-200 bg-purple-50 text-purple-800',
+                    'border-rose-200 bg-rose-50 text-rose-800',
+                    'border-slate-200 bg-slate-50 text-slate-700'
+                ];
+                fabricSummary.innerHTML = fabricLabels.map((label, index) => `
+                    <div class="rounded-lg border ${fabricColors[index]} px-2.5 py-2">
+                        <div class="text-[10px] font-extrabold uppercase tracking-wide opacity-75">${label}</div>
+                        <div class="mt-0.5 text-lg font-black">${fabricChartInstance.data.datasets[0].data[index]} <span class="text-[10px] font-bold">SPK</span></div>
+                    </div>
+                `).join('');
+            }
+            fabricChartInstance.update();
+        }
+
+        function loadProfileSettings() {
+            document.getElementById('setting-nama').value = profileSettings.nama;
+            document.getElementById('setting-sub').value = profileSettings.sub;
+            document.getElementById('setting-alamat').value = profileSettings.alamat;
+            document.getElementById('header-instansi-name').innerText = profileSettings.sub;
+        }
+
+        function saveInstansiSettings(event) {
+            event.preventDefault();
+            profileSettings = {
+                nama: document.getElementById('setting-nama').value,
+                sub: document.getElementById('setting-sub').value,
+                alamat: document.getElementById('setting-alamat').value
+            };
+            localStorage.setItem('edu_jersey_profile', JSON.stringify(profileSettings));
+            loadProfileSettings();
+            showToast("Profile Konveksi berhasil disimpan!", "success");
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            let colors = type === 'success' ? "bg-emerald-600 text-white" : type === 'error' ? "bg-rose-600 text-white" : type === 'warning' ? "bg-amber-500 text-slate-950" : "bg-slate-900 text-white";
+            toast.className = `p-3.5 rounded-xl shadow-xl text-sm font-bold ${colors} transition-all duration-300 transform translate-y-2 opacity-0 flex items-center justify-between gap-3 pointer-events-auto border border-slate-700`;
+            toast.innerHTML = `<span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
+            setTimeout(() => { toast.classList.add('opacity-0', 'translate-y-2'); setTimeout(() => toast.remove(), 300); }, 3000);
+        }
+    </script>
+</body>
+</html>
